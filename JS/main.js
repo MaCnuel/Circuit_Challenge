@@ -1,3 +1,8 @@
+/*----------Global Parameters -------*/
+const velMinimum = 170;
+const velMaximum = 300;
+
+
 /*-------------Classes---------------*/
 
 //Defining Circuit class
@@ -21,7 +26,37 @@ class Car {
         this.refuelTime = refuelTime;
         this.tireLifeTime = tireLifeTime;
     }
+
+    velocityChange(){
+        do{
+            this.velocity += 0.2*this.velocity*(Math.random()-0.5);
+        } while (this.velocity<=velMinimum && this.velocity>=velMaximum); //Minimum and maximum stablished
+        return this.velocity;
+    }
 }
+
+
+/*-----------------Functions--------------------*/
+
+
+function averageRoundTime(car, circuit) { //average time per round
+
+    let nStops = circuit.Kms/ car.gas + circuit.Kms/car.tireLifeTime;
+    let finalRoundTime = circuit.Kms/car.velocity + nStops * car.refuelTime;
+    return finalRoundTime; 
+}
+
+function averageTime(car, circuit){ // Final average time
+    let finalTime = 0;
+    for(let i=0; i<circuit.rounds; i++){
+        car.velocity = car.velocityChange();
+        finalTime +=averageRoundTime(car, circuit);
+    }
+
+    return finalTime;
+}
+
+
 
 //Two cars to start
 let Macklaren = new Car("Macklaren", 100, 250, 25, 150);
@@ -30,24 +65,7 @@ let Renault = new Car("Renault", 120, 230, 22, 160);
 //One Circuit to start
 let Valencia = new Circuit("Valencia", 10, 60);
 
- /*
-let velFunction = velocity =>{
-    return velocity +0.1* velocity * Math.random();
-}
-*/
 
-function averageTime(KMS, rounds, vel, gas, refuelTime ) {
+console.log(`Average time for ${Macklaren.brand} is ${averageTime(Macklaren,Valencia)}`);
 
-    let nStops = KMS*rounds/ gas;
-    console.log (nStops);
-    console.log(KMS, rounds, vel, gas, refuelTime);
-    let finalTime = KMS/vel + nStops * refuelTime;
-    console.log(finalTime);
-    return finalTime; 
-}
-
-let timeMac = averageTime(Valencia.Kms,Valencia.rounds,Macklaren.velocity, Macklaren.gas, Macklaren.refuelTime);
-
-console.log(`Average time for ${Macklaren.brand} is ${timeMac}`);
-
-console.log(`Average time for ${Renault.brand} is ${averageTime(Valencia.Kms,Valencia.rounds,Renault.velocity, Renault.gas, Renault.refuelTime)}`);
+console.log(`Average time for ${Renault.brand} is ${averageTime(Renault,Valencia)}`);
